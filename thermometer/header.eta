@@ -1,0 +1,28 @@
+esphome:
+  name: "thermometer "
+  friendly_name: "thermometer"
+  platformio_options: 
+    build_flags: -Os -pipe -fomit-frame-pointer
+esp32:
+  board: esp32-c6-devkitc-1
+  framework:
+    type: esp-idf
+logger:
+  level: INFO
+api:
+  encryption:
+    key: "TopSecretKey"
+ota:
+  - platform: esphome
+    password: "TopSecretPassword"
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  output_power: 20
+  fast_connect: True
+  domain: .lan
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "thermometer failsafe"
+    password: "TopSecretPassword"
+captive_portal:
