@@ -1,0 +1,18 @@
+<%~ include('./.lib/header') %>
+button:
+  - platform: restart
+    name: "reboot"
+substitutions:
+  temp_update_interval: 1s
+  filter_emav_push_interval: 15
+  filter_emav_alpha: 0.2
+  filter_round_temp_decimals: 1
+one_wire:
+  - platform: gpio
+    pin: GPIO2
+    id: bus0
+  - platform: gpio
+    pin: GPIO3
+    id: bus1
+
+sensor: <% ~include('./.lib/ds18b20') %>
