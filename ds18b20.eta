@@ -1,0 +1,45 @@
+<%
+//calibration LUT
+calibrations = [
+    {'id':'7628','address':'0x1d000000bceb7628','cal':'[0.40 -> 0.00, 20.00 -> 20.00, 35.00 -> 35.00]'},
+    {'id':'7928','address':'0x2a000000bbbb7928','cal':'[0.40 -> 0.00, 20.00 -> 20.00, 35.00 -> 35.00]'},
+    {'id':'6528','address':'0x45000000bb8a6528','cal':'[0.10 -> 0.00, 20.00 -> 20.00, 35.00 -> 35.00]'},
+    {'id':'a928','address':'0x4e00000079c2a928','cal':'[0.35 -> 0.00, 20.00 -> 20.00, 35.00 -> 35.00]'},
+    {'id':'a628','address':'0x4f000000bb38a628','cal':'[0.30 -> 0.00, 20.00 -> 20.00, 35.00 -> 35.00]'},
+    {'id':'1328','address':'0x6a000000bbc71328','cal':'[0.35 -> 0.00, 20.00 -> 20.00, 35.00 -> 35.00]'},
+    {'id':'c628','address':'0x6d000000bcd2c628','cal':'[0.10 -> 0.00, 20.00 -> 20.00, 35.00 -> 35.00]'},
+    {'id':'4d28','address':'0x7f000000bb9d4d28','cal':'[0.10 -> 0.00, 20.00 -> 20.00, 35.00 -> 35.00]'},
+    {'id':'7228','address':'0xad000000bf037228','cal':'[0.00 -> 0.00, 20.00 -> 20.00, 35.00 -> 35.00]'},
+    {'id':'b328','address':'0xc5000000bbceb328','cal':'[0.35 -> 0.00, 20.00 -> 20.00, 35.00 -> 35.00]'},
+    {'id':'2128','address':'0xc8000000b3032128','cal':'[0.30 -> 0.00, 20.00 -> 20.00, 35.00 -> 35.00]'},
+    {'id':'a728','address':'0xde000000b300a728','cal':'[0.20 -> 0.00, 20.00 -> 20.00, 35.00 -> 35.00]'},
+    {'id':'da28','address':'0xf4000000bca7da28','cal':'[0.10 -> 0.00, 20.00 -> 20.00, 35.00 -> 35.00]'}
+]
+
+//sensors to include
+sensors = ['7628','7928','6528','a928','a628','1328','c628','4d28','b328','2128','a728','da28']
+
+//maximum sensors per bus
+max_sens = 8
+
+//construct sensor
+for (let i = 0; i < sensors.length; i++) { %>
+  - platform: dallas_temp
+    one_wire_id: "bus<% =Math.trunc(i/max_sens) %>"
+    setup_priority: -100
+    name: "<% = calibrations.find(x => x.id == sensors[i]).id %>"
+    address: "<% = calibrations.find(x => x.id == sensors[i]).address %>"
+    device_class: temperature
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    state_class: measurement
+    update_interval: ${temp_update_interval}
+    filters:
+    - exponential_moving_average: 
+        send_every: ${filter_emav_push_interval}
+        alpha: ${filter_emav_alpha}
+    - calibrate_linear:
+        method: exact
+        datapoints: <% = calibrations.find(x => x.id == sensors[i]).cal %>
+    - round: ${filter_round_temp_decimals}
+<% } %>
